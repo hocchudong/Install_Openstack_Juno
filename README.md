@@ -43,12 +43,12 @@ Bài viết này tham khảo tại địa chỉ http://docs.openstack.org/juno/i
 
 [C. Kiểm tra lại quá trình cài đặt](#C)
 <ul>
-<li>		 [a. Kiểm tra hoạt động của các dịch vụ.](#a)</li>
-<li>		 [b. Tạo external network.](#b)</li>
-<li>	 	 [c. Tạo internal network.](#c)</li>
-<li>		 [d. Tạo router.](#d)</li>
-<li>		 [e. Kiểm tra lại mô hình mạng.](#e)</li>
-<li>		 [f. Khởi tạo 1 instances.](#f)</li>
+<li>		 [a. Kiểm tra hoạt động của các dịch vụ.]</li>(#a)
+<li>		 [b. Tạo external network.]</li>(#b)
+<li>	 	 [c. Tạo internal network.]</li>(#c) 
+<li>		 [d. Tạo router.]</li>(#d)
+<li>		 [e. Kiểm tra lại mô hình mạng.]</li>(#e)
+<li>		 [f. Khởi tạo 1 instances.]</li>(#f)
 </ul>
 [D. Tài liệu tham khảo](#D)
 
