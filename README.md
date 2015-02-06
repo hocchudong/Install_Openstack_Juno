@@ -39,9 +39,12 @@ Bài viết này tham khảo tại địa chỉ http://docs.openstack.org/juno/i
 <li>		[3.5 Cài đặt Nova.](#3.5)</li>
 <li>		[3.6 Cài đặt Neutron.](#3.6)</li>
 </ul>
+
 - [IV. Cài đặt Horizon](#IV)
 
 [C. Kiểm tra lại quá trình cài đặt](#C)
+
+-
 
 <ul>
 <li>		 [a. Kiểm tra hoạt động của các dịch vụ.](#a)</li>
