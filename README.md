@@ -42,6 +42,7 @@ Bài viết này tham khảo tại địa chỉ http://docs.openstack.org/juno/i
 - [IV. Cài đặt Horizon](#IV)
 
 [C. Kiểm tra lại quá trình cài đặt](#C)
+
 <ul>
 <li>		 [a. Kiểm tra hoạt động của các dịch vụ.](#a)</li>
 <li>		 [b. Tạo external network.](#b)</li>
@@ -50,6 +51,7 @@ Bài viết này tham khảo tại địa chỉ http://docs.openstack.org/juno/i
 <li>		 [e. Kiểm tra lại mô hình mạng.](#e)</li>
 <li>		 [f. Khởi tạo 1 instances.](#f)</li>
 </ul>
+
 [D. Tài liệu tham khảo](#D)
 
 ----------------------------------------------------------------------------------------------------------------------------
