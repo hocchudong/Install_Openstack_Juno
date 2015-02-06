@@ -30,6 +30,7 @@ Bài viết này tham khảo tại địa chỉ http://docs.openstack.org/juno/i
 <li>	[2.5 Cài đặt Neutron.](#2.5)</li>
 <li>	[2.6 Cấu hình OVS service..](#2.6)</li>
 </ul>
+
 - [III. COMPUTE NODE](#III)
 <ul>
 <li>		[3.1. Enable OpenStack repository.](#3.1)</li>
@@ -43,17 +44,14 @@ Bài viết này tham khảo tại địa chỉ http://docs.openstack.org/juno/i
 - [IV. Cài đặt Horizon](#IV)
 
 [C. Kiểm tra lại quá trình cài đặt](#C)
-
--
-
-<ul>
-<li>		 [a. Kiểm tra hoạt động của các dịch vụ.](#a)</li>
-<li>		 [b. Tạo external network.](#b)</li>
-<li>	 	 [c. Tạo internal network.](#c)</li>
-<li>		 [d. Tạo router.](#d)</li>
-<li>		 [e. Kiểm tra lại mô hình mạng.](#e)</li>
-<li>		 [f. Khởi tạo 1 instances.](#f)</li>
-</ul>
+-<ul>
+-<li>		 [a. Kiểm tra hoạt động của các dịch vụ.](#a)</li>
+-<li>		 [b. Tạo external network.](#b)</li>
+-<li>	 	 [c. Tạo internal network.](#c)</li>
+-<li>		 [d. Tạo router.](#d)</li>
+-<li>		 [e. Kiểm tra lại mô hình mạng.](#e)</li>
+-<li>		 [f. Khởi tạo 1 instances.](#f)</li>
+-</ul>
 
 [D. Tài liệu tham khảo](#D)
 
