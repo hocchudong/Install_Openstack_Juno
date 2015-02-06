@@ -2,7 +2,8 @@
 
 Bài viết này tham khảo tại địa chỉ http://docs.openstack.org/juno/install-guide/install/apt/content/
 
-*Các mật khẩu trong quá trình cài đặt đều là :* **osjuno123a@** 
+*Các mật khẩu trong quá trình cài đặt đều là* : **osjuno123a@** 
+
 ----------------------------------------------------------------------------------------------------------------------------
 
 [A. Mô hình cài đặt](#A)
