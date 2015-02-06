@@ -1,89 +1,167 @@
-Skip to content
- This repository
-Explore
-Gist
-Blog
-Help
-Trần Mạnh Huy huytm
- 
-1  Unwatch 
-  Star 0
- Fork 0huytm/Oenstack_juno
-Oenstack_juno/   or cancel
- Edit file   Preview changes
-Oenstack_juno
-Huong dan
+#HƯỚNG DẪN CÀI ĐẶT OPENSTACK-JUNO TRÊN UBUNTU 14.04.1
 
-Controller
-Controller Network: eth0: 10.10.10.4610.200, 
-		   network eth1: 172.16.69.4669.200 (vi/etc/network/interfaces)
+Bài viết này tham khảo tại địa chỉ http://docs.openstack.org/juno/install-guide/install/apt/content/
 
-add repo
+*Các mật khẩu trong quá trình cài đặt đều là :* **osjuno123a@** 
+----------------------------------------------------------------------------------------------------------------------------
+[A. Mô hình cài đặt](#A)
+
+[B. Các bước cài đặt chính](#B)
+- [I. CONTROLLER NODE](#I)
+<ul>
+<li>    	[1.1. Enable OpenStack repository](#ctl)</li>
+<li>    	[1.2 Upgrade các packages hệ thống](#12)</li>
+<li>    	[1.3. Cài đặt NTP service.](#13)</li>
+<li>    	[1.4. Cài đặt RabbitMQ làm Messaging server.](#14)</li>
+<li>		[1.5. Cài đặt Database server.](#1.5)</li>
+<li>		[1.6 Cài đặt Keystone.](#1.6)</li>
+<li>		[1.7. Tạo các Tenant, User, Role.](#1.7)</li>
+<li>		[1.8 Tạo Script biến môi trường](#1.8)</li>
+<li>		[1.9. Cài đặt Glance.](#1.9)</li>
+<li>		[1.10 Cài đặt Nova.](#1.10)</li>
+<li>		[1.11 Cài đặt Neutron.](#1.11)</li>
+</ul>
+- [II. NETWORK NODE](#II)
+<ul>
+<li>	[2.1. Enable OpenStack repository.](#2.1)</li>
+<li>	[2.2. Upgrade các packages hệ thống.](#2.2)</li>
+<li>	[2.3. Cài đặt python-mysql.](#2.3)</li>
+<li>	[2.4. Cài đặt NTP service.](#2.4)</li>
+<li>	[2.5 Cài đặt Neutron.](#2.5)</li>
+<li>	[2.6 Cấu hình OVS service..](#2.6)</li>
+</ul>
+- [III. COMPUTE NODE](#III)
+<ul>
+<li>		[3.1. Enable OpenStack repository.](#3.1)</li>
+<li>		[3.2. Upgrade các packages hệ thống.](#3.2)</li>
+<li>		[3.3. Cài đặt python-mysql.](#3.3)</li>
+<li>		[3.4. Cài đặt NTP service.](#3.4)</li>
+<li>		[3.5 Cài đặt Nova.](#3.5)</li>
+<li>		[3.6 Cài đặt Neutron.](#3.6)</li>
+</ul>
+- [IV. Cài đặt Horizon] (#IV)
+[C. Kiểm tra lại quá trình cài đặt] (#C)
+<ul>
+<li>		 [a. Kiểm tra hoạt động của các dịch vụ.](#a)</li>
+<li>		 [b. Tạo external network.](#b)</li>
+<li>	 	 [c. Tạo internal network.](#c)</li>
+<li>		 [d. Tạo router.](#d)</li>
+<li>		 [e. Kiểm tra lại mô hình mạng.](#e)</li>
+<li>		 [f. Khởi tạo 1 instances.](#f)</li>
+</ul>
+[D. Tài liệu tham khảo](#D)
+
+----------------------------------------------------------------------------------------------------------------------------
+<a name="A"></a>
+#A. Mô hình cài đặt 
+
+<img src="http://i.imgur.com/qzMwJ62.png">
+
+<ul><ul><ul><ul><ul><ul><ul><ul><ul>Mô hình cài đặt Openstack Juno theo 3 node</ul></ul></ul></ul></ul></ul></ul></ul></ul>
+
+<a name="B"></a>
+
+#B. Các bước cài đặt chính
+<a name="I"></a>
+
+##I. CONTROLLER NODE
+
+<a name="ctl"></a>
+####1.1 Enable OpenStack repository.
 ```sh
 # apt-get install ubuntu-cloud-keyring
 # echo "deb http://ubuntu-cloud.archive.canonical.com/ubuntu" \
   "trusty-updates/juno main" > /etc/apt/sources.list.d/cloudarchive-juno.list
 ```
-  
-update va dist-upgrade
+
+<a name="12"></a>  
+#####1.2 Upgrade các packages hệ thống.
 
 `# apt-get update -y && apt-get dist-upgrade -y`
 
-Cai dat ntp
+<a name="13"></a>
+#####1.3.	Cài đặt NTP service.
+<ul>
+NTP (Network Time protocol) sử dụng để đồng bộ hóa về thời gian giữa các dịch vụ ở các node khác nhau
+</ul>
 
-`apt-get install ntp`
+- *Download và cài đặt NTP service* 
 
-Cau hinh ntp `vi /etc/ntp.conf`
+`# apt-get install ntp -y`
 
-sua dong `server ntp.ubuntu.com`
+- *Cấu hình NTP service tại file `vi /etc/ntp.conf`*
 
-thanh 
-
+- *Sửa dòng* `server ntp.ubuntu.com`
+<ul>
+*thành*
+</ul>
 ```sh
 server 0.vn.pool.ntp.org iburst 
 server 1.asia.pool.ntp.org iburst 
 server 2.asia.pool.ntp.org iburst
 ```
 
-va 
 
+- *Và sửa đoạn*
+<ul>
 ```sh
 restrict -6 default kod notrap nomodify nopeer noquery
 restrict -4 default kod notrap nomodify nopeer noquery
 ```
+</ul>
 
-thanh
-
+<ul>
+*thành*
+</ul>
 ```sh
 restrict -4 default kod notrap nomodify
 restrict -6 default kod notrap nomodify
 ```
 
-restart ntp 
 
-`service ntp restart`
+- *restart ntp* 
 
-Cai dat rabbitmq 
+`# service ntp restart`
 
-`apt-get install rabbitmq-server`
+<a name="14"></a>
+#####1.4.	Cài đặt RabbitMQ làm Messaging server.
+<ul>
+Openstack sử dụng một messaging server để thông báo thông tin trạng thái, và sự phối hợp các dịch vụ trong hệ thống
+</ul>
+- *Download và cài đặt rabbitqm là massaging server* 
 
-Dat pass cho rabbit
+`# apt-get install rabbitmq-server -y`
+
+- *Đặt lại mật khẩu cho Rabbitmq*
 ```sh
 # rabbitmqctl change_password guest osjuno123a@
 Changing password for user "guest" ...
 ...done.
 ```
 
-Cai dat mysql
+<a name="1.5"></a>
+#####1.5.	Cài đặt Database server.
+<ul>
+Hầu hết các dịch vụ của Openstack cần phải có một hệ quản trị cơ sở dữ liệu để lưu trữ thông tin. Ở đây ta sẽ cài đặt mariadb-server làm database server chính để lưu trữ thông tin của các server.( Ngoài ra bạn cũng có thể sử dụng mysql-server để thay thế cho mariadb-server, tùy vào hoàn cành sử dụng).
+</ul>
+- *Download và cài đặt mariadb làm database server*
 
-# apt-get install mariadb-server python-mysqldb
+`# apt-get install mariadb-server python-mysqldb -y`
 
-Tai buoc http://imgur.com/yZb0eDy
+- Tại bước 
 
-Nhap mat khau
+<img src="http://tecadmin.net/wp-content/uploads/2014/12/mariadb-10-ubuntu.png">
 
-Cau hinh file /etc/mysql/my.cnf
+*Nguồn techadmin.net*
 
+=> Nhập mật khẩu cho Database server
+
+
+
+- *Cấu hình file /etc/mysql/my.cnf*
+<ul>
+Cấu hình để cho phép các node khác trong mạng có thể truy cập đến Database server được cài đặt trên controller node, và cấu hình các tùy chọn hữu ích.
+</ul>
 ```sh
 [mysqld]
 bind-address = 0.0.0.0
@@ -94,10 +172,11 @@ init-connect = 'SET NAMES utf8'
 character-set-server = utf8
 ```
 
-bao mat cho mysql service
+- *Secure database service*
 
-# mysql_secure_installation
+`# mysql_secure_installation`
 
+- *Thực hiện tuần tự theo các bước sau*
 ```sh
 Enter current password for root (enter for none): [your password]
 Change the root password? [Y/n]: n
@@ -107,36 +186,41 @@ Remove test database and access to it? [Y/n]: y
 Reload privilege tables now? [Y/n]: y
 ```
 
-Khoi dong lai dich vu
+- *Khởi động lại dịch vụ*
 
-# service mysql restart
+`# service mysql restart`
 
-TAO CAC DB CHO CAC SERVICE
+- *Tạo các database cho từng service chính của Openstack**
+<ul>
+Các project chính của Openstack gồm có **Keystone**, **Glance**, **Nova**, **Neutron**. Mỗi một service này cần một database riêng để lưu trữ cơ sở dữ liệu của mình.
+</ul>
+<ul>
+Để tạo các database này ta thực hiện theo bước sau:
+</ul>
+`# mysql -uroot -p`
 
-# mysql -uroot -p
-
-Tao db cho keystone
+*Tạo database cho Keystone*
 ```sh
 CREATE DATABASE keystone;
 GRANT ALL PRIVILEGES ON keystone.* TO 'keystone'@'%' IDENTIFIED BY 'osjuno123a@';
 GRANT ALL PRIVILEGES ON keystone.* TO 'keystone'@'localhost' IDENTIFIED BY 'osjuno123a@';
 GRANT ALL PRIVILEGES ON keystone.* TO 'keystone'@'10.10.10.200' IDENTIFIED BY 'osjuno123a@';
 ```
-Tao db cho glance
+*Tạo database cho Glance*
 ```sh
 CREATE DATABASE glance;
 GRANT ALL PRIVILEGES ON glance.* TO 'glance'@'%' IDENTIFIED BY 'osjuno123a@';
 GRANT ALL PRIVILEGES ON glance.* TO 'glance'@'localhost' IDENTIFIED BY 'osjuno123a@';
 GRANT ALL PRIVILEGES ON glance.* TO 'glance'@'10.10.10.200' IDENTIFIED BY 'osjuno123a@';
 ```
-Tao db cho nova
+*Tạo database cho Nova*
 ```sh
 CREATE DATABASE nova;
 GRANT ALL PRIVILEGES ON nova.* TO 'nova'@'%' IDENTIFIED BY 'osjuno123a@';
 GRANT ALL PRIVILEGES ON nova.* TO 'nova'@'localhost' IDENTIFIED BY 'osjuno123a@';
 GRANT ALL PRIVILEGES ON nova.* TO 'nova'@'10.10.10.200' IDENTIFIED BY 'osjuno123a@';
 ```
-Tao db cho neutron
+*Tạo database cho Neutron*
 ```sh
 CREATE DATABASE neutron;
 GRANT ALL PRIVILEGES ON neutron.* TO 'neutron'@'%' IDENTIFIED BY 'osjuno123a@';
@@ -144,12 +228,14 @@ GRANT ALL PRIVILEGES ON neutron.* TO 'neutron'@'localhost' IDENTIFIED BY 'osjuno
 GRANT ALL PRIVILEGES ON neutron.* TO 'neutron'@'10.10.10.200' IDENTIFIED BY 'osjuno123a@';
 ```
 
-------------------------------------------
-CAI DAT KEYSTONE
+<a name="1.6"></a>
+####1.6 Cài đặt Keystone
 
-apt-get install keystone python-keystoneclient
+- *Cài đặt keystone để làm Identity service cho Openstack*
 
-edit file /etc/keystone/keystone.conf
+`# apt-get install keystone python-keystoneclient -y`
+
+- *Cấu hình chính keystone tại file* `vi /etc/keystone/keystone.conf`
 ```sh
 [DEFAULT]
 ...
@@ -164,60 +250,69 @@ provider = keystone.token.providers.uuid.Provider
 driver = keystone.token.persistence.backends.sql.Token
 ```
 
-Dong bo db keystone voi mysql database
- 
-`# su -s /bin/sh -c "keystone-manage db_sync" keystone`
-
-restart keystone
-
-`# service keystone restart`
-
-xoa cac db mac dinh
+- *Xóa database mặc định khi cài đặt keystone*
 
 `# rm -f /var/lib/keystone/keystone.db`
 
-Cau hinh xoa cac token het han
+- *Đồng bộ database của keystone*
+ 
+`# su -s /bin/sh -c "keystone-manage db_sync" keystone`
+
+- *Restart keystone*
+
+`# service keystone restart`
+
+- *Cấu hình để xóa các token hết hạn*
+<ul>
+Theo mặc định, Identity service sẽ vẫn lưu các token hết hạn trong database, điều này làm tăng kích thước của database và giảm hiệu suất dịch vụ. Để cấu hình xóa các token hết hạn này theo 1 giờ ta thực hiện câu lệnh sau:
+</ul>
 ```sh
 # (crontab -l -u keystone 2>&1 | grep -q token_flush) || \
   echo '@hourly /usr/bin/keystone-manage token_flush >/var/log/keystone/keystone-tokenflush.log 2>&1' \
   >> /var/spool/cron/crontabs/keystone
 ```
 
-Tao cac tenant admin
+<a name="1.7"></a>
+####1.7.  Tạo các Tenant, User, Role.
+<ul>
+Dịch vụ xác thực (Identity service) trong Open stack ngoài nhiệm vụ xác thực người dùng, còn được dùng để xác thực và ủy quyền giữa các dịch vụ với nhau trong Openstack. Để tạo các user, service entity, service endpoint tương ứng cho từng dịch vụ ta thực hiện tuần tự theo các bước sau:
+</ul>
 
-`# export OS_SERVICE_TOKEN=osjuno123a@` (Chu y lay o file /etc/keystone/keystone.conf)
+- *Tạo tenant admin*
+
+`# export OS_SERVICE_TOKEN=osjuno123a@` (**Chú ý** OS_SERVICE_TOKEN phải giống với admin_token ở file /etc/keystone/keystone.conf)
 
 `# export OS_SERVICE_ENDPOINT=http://10.10.10.200:35357/v2.0`
 
-`$ keystone tenant-create --name admin --description "Admin Tenant"`
+`# keystone tenant-create --name admin --description "Admin Tenant"`
 
-Tao user admin
+- *Tạo user admin*
 
-`$ keystone user-create --name admin --pass osjuno123a@ --email admin_osjuno@gmail.com`
+`# keystone user-create --name admin --pass osjuno123a@ --email admin_osjuno@gmail.com`
 
-Tao role
+- *Tao role admin*
 
-`$ keystone role-create --name admin`
+`# keystone role-create --name admin`
 
-add role
+- *Add role vừa khởi tạo cho user admin và tenant admin*
 
-`keystone user-role-add --user admin --tenant admin --role admin`
+`# keystone user-role-add --user admin --tenant admin --role admin`
 
-Tao tenant service cho cac dich vu
+- *Tao tenant service cho các dịch vụ*
 
-`$ keystone tenant-create --name service --description "Service Tenant"`
+`# keystone tenant-create --name service --description "Service Tenant"`
 
-Tao cho cac service user
+- *Tao cho các service user*
 
 ```sh
-$ keystone user-create --name glance --pass osjuno123a@
+# keystone user-create --name glance --pass osjuno123a@
 
-$ keystone user-create --name nova --pass osjuno123a@
+# keystone user-create --name nova --pass osjuno123a@
 
-$ keystone user-create --name neutron --pass osjuno123a@
+# keystone user-create --name neutron --pass osjuno123a@
 ```
 
-Add role cho cac user
+- *Add role cho các user*
 
 ```sh
 # keystone user-role-add --user glance --tenant service --role admin
@@ -227,7 +322,7 @@ Add role cho cac user
 # keystone user-role-add --user neutron --tenant service --role admin
 ```
 
-Tao cac service entity
+- *Tạo các service entity cho từng dịch vụ*
 
 ```sh
 # keystone service-create --name keystone --type identity \
@@ -243,11 +338,11 @@ Tao cac service entity
   --description "OpenStack Networking"
 ```
 
-Tao cac endpoint
+- *Tạo các endpoint tương ứng cho từng dịch vụ*
 
-keystone
+*keystone*
 ```sh
-$ keystone endpoint-create \
+# keystone endpoint-create \
   --service-id $(keystone service-list | awk '/ identity / {print $2}') \
   --publicurl http://10.10.10.200:5000/v2.0 \
   --internalurl http://10.10.10.200:5000/v2.0 \
@@ -255,28 +350,29 @@ $ keystone endpoint-create \
   --region regionOne
 ```
   
-glance
+*glance*
 ```sh
-$ keystone endpoint-create \
+# keystone endpoint-create \
   --service-id $(keystone service-list | awk '/ image / {print $2}') \
   --publicurl http://10.10.10.200:9292 \
   --internalurl http://10.10.10.200:9292 \
   --adminurl http://10.10.10.200:9292 \
   --region regionOne
 ```
-nova
+
+*nova*
 ```sh
-$ keystone endpoint-create \
+# keystone endpoint-create \
   --service-id $(keystone service-list | awk '/ compute / {print $2}') \
   --publicurl http://10.10.10.200:8774/v2/%\(tenant_id\)s \
   --internalurl http://10.10.10.200:8774/v2/%\(tenant_id\)s \
   --adminurl http://10.10.10.200:8774/v2/%\(tenant_id\)s \
   --region regionOne
-```sh
+```
 
-neutron
+*neutron*
 ```sh
-$ keystone endpoint-create \
+# keystone endpoint-create \
   --service-id $(keystone service-list | awk '/ network / {print $2}') \
   --publicurl http://10.10.10.200:9696 \
   --adminurl http://10.10.10.200:9696 \
@@ -284,9 +380,15 @@ $ keystone endpoint-create \
   --region regionOne
 ```
 
-TAo file bien moi truong `vi admin-openrc.sh`
+<a name="1.8"></a>
+####1.8 Tạo Script biến môi trường
+<ul>
+Tạo script biến môi trường cho admin user để tải các thông tin thích hợp cho các hoạt động cấu hình sau này
+</ul>
 
-Noi dung
+- *Tạo file biến môi trườnng* `vi admin-openrc.sh`
+
+- *Với nội dung*
 
 ```sh
 export OS_TENANT_NAME=admin
@@ -295,12 +397,14 @@ export OS_PASSWORD=osjuno123a@
 export OS_AUTH_URL=http://10.10.10.200:35357/v2.0
 ```
 
-Cai dat glance
+<a name="1.9"></a>
+####1.9.	Cài đặt Glance
 
-`apt-get install glance python-glanceclient -y`
+- *Download và cài đặt glance làm Image service cho Openstack*
 
-Edit `vi /etc/glance/glance-api.conf`
+`# apt-get install glance python-glanceclient -y`
 
+- *Cấu hình chính Glance* `# vi /etc/glance/glance-api.conf`
 ```sh
 [database]
 ...
@@ -329,8 +433,7 @@ notification_driver = noop
 verbose = True
 ```
 
-Edit file `vi /etc/glance/glance-registry.conf`
-
+- *Edit file* `vi /etc/glance/glance-registry.conf`
 ```sh
 [database]
 ...
@@ -353,50 +456,29 @@ notification_driver = noop
 verbose = True
 ```
 
-Xoa cac db mac dinh `rm -f /var/lib/glance/glance.sqlite`
+- *Xóa database mặc định của Glance* `rm -f /var/lib/glance/glance.sqlite`
 
-Dong bo db
+- *Đồng bộ database của Glance với server*
 
-`su -s /bin/sh -c "glance-manage db_sync" glance`
+`# su -s /bin/sh -c "glance-manage db_sync" glance`
 
-Restart
+- *Restart Glance*
 
 ```sh
 service glance-registry restart
 service glance-api restart
 ```
 
-Verify
+<a name="1.10"></a>
+####1.10 Cài đặt Nova
 
-Tao folder
-
+- *Download và cài đặt nova làm compute service*
 ```sh
-$ mkdir /tmp/images
-$ cd /tmp/images
+# apt-get install nova-api nova-cert nova-conductor nova-consoleauth \
+  nova-novncproxy nova-scheduler python-novaclient -y
 ```
 
-download
-
-`wget http://cdn.download.cirros-cloud.net/0.3.3/cirros-0.3.3-x86_64-disk.img`
-
-source file bien moi truong
-
-`source admin-openrc.sh`
-
-upload
-
-```sh
-glance image-create --name "cirros-0.3.3-x86_64" --file cirros-0.3.3-x86_64-disk.img \
-  --disk-format qcow2 --container-format bare --is-public True --progress
-```
-  
-Cai dat NOVA
-```sh
-apt-get install nova-api nova-cert nova-conductor nova-consoleauth \
-  nova-novncproxy nova-scheduler python-novaclient
-```
-
-Cau hinh file `vi /etc/nova/nova.conf`
+- *Cấu hình Nova* `vi /etc/nova/nova.conf`
 
 ```sh
 [database]
@@ -427,15 +509,15 @@ admin_password = osjuno123a@
 host = 10.10.10.200
 ```
 
-Dong bo db
+- *Xóa database mặc định của Nova*
 
-`su -s /bin/sh -c "nova-manage db sync" nova`
+`# rm -f /var/lib/nova/nova.sqlite`
 
-Xoa db mac dinh
+- *Đồng bộ Nova database với server*
 
-`rm -f /var/lib/nova/nova.sqlite`
+`# su -s /bin/sh -c "nova-manage db sync" nova`
 
-restart nova
+- *Restart nova*
 
 ```sh
 service nova-api restart
@@ -446,11 +528,14 @@ service nova-conductor restart
 service nova-novncproxy restart
 ```
 
-CAI DAT neutron
+<a name="1.11"></a>
+####1.11 Cài đặt Neutron
 
-`apt-get install neutron-server neutron-plugin-ml2 python-neutronclient`
+- *Download và cài đặt Neutron*
 
-cau hinh networking server `vi /etc/neutron/neutron.conf`
+`# apt-get install neutron-server neutron-plugin-ml2 python-neutronclient -y`
+
+- *Cấu hình networking server* `vi /etc/neutron/neutron.conf`
 
 ```sh
 [database]
@@ -485,9 +570,9 @@ admin_user = neutron
 admin_password = osjuno123a@
 ```
 
-Chu y tenant nova_admin_tenant_id = SERVICE_TENANT_ID dung lenh `keystone tenant-get service` de lay id
+**Chú ý**  nova_admin_tenant_id = , Ta dùng lệnh `keystone tenant-get service` để lấy id
 
-Cau hinh ml2 `vi /etc/neutron/plugins/ml2/ml2_conf.ini`
+- *Cấu hình ML2 plug-in* `vi /etc/neutron/plugins/ml2/ml2_conf.ini`
 
 ```sh
 [ml2]
@@ -505,8 +590,10 @@ tunnel_id_ranges = 1:1000
 enable_security_group = True
 enable_ipset = True
 firewall_driver = neutron.agent.linux.iptables_firewall.OVSHybridIptablesFirewallDriver
-Cau hinh compute su dung network vi /etc/nova/nova.conf
+```
 
+- *Cau hinh compute su dung network* vi /etc/nova/nova.conf
+```sh
 [DEFAULT]
 ...
 network_api_class = nova.network.neutronv2.api.API
@@ -524,14 +611,14 @@ admin_username = neutron
 admin_password = osjuno123a@
 ```
 
-Dong bo db
+- *Đồng bộ neutron database*
 
 ```sh
-su -s /bin/sh -c "neutron-db-manage --config-file /etc/neutron/neutron.conf \
+# su -s /bin/sh -c "neutron-db-manage --config-file /etc/neutron/neutron.conf \
   --config-file /etc/neutron/plugins/ml2/ml2_conf.ini upgrade juno" neutron
 ```
   
-restart nova
+- *Restart Nova*
 
 ```sh
 service nova-api restart
@@ -539,17 +626,17 @@ service nova-scheduler restart
 service nova-conductor restart
 ```
 
-restart neutron
+- *Restart neutron*
 
-service neutron-server restart
+`# service neutron-server restart``
 
------------------------------------------------------------------------------------------------------------------------------------------------------------------
------------------------------------------------------------------------------------------------------------------------------------------------------------------
------------------------------------------------------------------------------------------------------------------------------------------------------------------
-----------------------------------------------------------------------------------------------------------------------------------------------------------------
-NETWORK NODE
+----------------------------------------------------------------------------------------------------------------------------
 
-add repo
+<a name="II"></a>
+##II. NETWORK NODE
+
+<a name="2.1"></a>
+####2.1.	Enable OpenStack repository.
 
 ```sh
 # apt-get install ubuntu-cloud-keyring
@@ -557,22 +644,27 @@ add repo
   "trusty-updates/juno main" > /etc/apt/sources.list.d/cloudarchive-juno.list
 ```
 
-upgrade
+<a name="2.2"></a>
+####2.2.	Upgrade các packages hệ thống.
 
 `# apt-get update -y && apt-get dist-upgrade -y`
 
-cai dat python-mysql
+<a name="2.3"></a>
+####2.3.	Cài đặt python-mysql.
 
-`# apt-get install python-mysqldb`
+`# apt-get install python-mysqldb -y`
 
-cai ntp
+<a name="2.4"></a>
+####2.4.	Cài đặt NTP service
 
-`# apt-get install ntp`
+- *Download và cài đặt NTP*
 
-Cau hinh file `/vi/etc/ntp.conf`
+`# apt-get install ntp -y`
 
-comment lai cac dong
-
+- *Cấu hình NTP* `vi /etc/ntp.conf`
+<ul>
+comment lại các dòng sau
+</ul>
 ```sh
 #server 0.ubuntu.pool.ntp.org
 #server 1.ubuntu.pool.ntp.org
@@ -580,29 +672,31 @@ comment lai cac dong
 #server 3.ubuntu.pool.ntp.org
 
 ````
+<ul>
+Sửa dòng `server ntp.ubuntu.com` thàhh `server 10.10.10.200 iburst`
+</ul>
 
-Sua dong `server ntp.ubuntu.com` thanh `server 10.10.10.200 iburst`
+<a name="2.5"></a>
+####2.5 Cài đặt Neutron
 
-them cac dong sau vao file `vi /etc/sysctl.conf`
-
+- *Cấu hình các thông số mạng*  `vi /etc/sysctl.conf` *và thêm nội dung sau*
 ```sh
 net.ipv4.ip_forward=1
 net.ipv4.conf.all.rp_filter=0
 net.ipv4.conf.default.rp_filter=0
 ```
 
-Thuc thi ngay lap tuc file nay
+- *Thực hiện các thay đổi thông số mạng này ngay lập tức:*
 
 `# sysctl -p`
 
-Cai neutron
-
+- *Download và cài đặt Neutron*
 ```sh
-apt-get install neutron-plugin-ml2 neutron-plugin-openvswitch-agent \
+# apt-get install neutron-plugin-ml2 neutron-plugin-openvswitch-agent \
   neutron-l3-agent neutron-dhcp-agent -y
 ```
   
-Cau hinh file `vi /etc/neutron/neutron.conf`
+- *Cấu hình neutron* `vi /etc/neutron/neutron.conf`
 
 ```sh
 [DEFAULT]
@@ -643,7 +737,7 @@ firewall_driver = neutron.agent.linux.iptables_firewall.OVSHybridIptablesFirewal
 
 [ovs]
 ...
-local_ip = 10.10.20.201 (Chu y: la ip cua may network theo dai vm-data)
+local_ip = 10.10.20.201 #(Chu y: la ip cua may network theo dai vm-data)
 enable_tunneling = True
 bridge_mappings = external:br-ex
 
@@ -652,7 +746,7 @@ bridge_mappings = external:br-ex
 tunnel_types = gre
 ```
 
-Cau hinh l3-agent vi /etc/neutron/l3_agent.ini
+- *Cấu hình l3-agent* `vi /etc/neutron/l3_agent.ini`
 
 ```sh
 [DEFAULT]
@@ -663,7 +757,7 @@ external_network_bridge = br-ex
 verbose = True
 ```
 
-Cau hinh dhcp-agent `vi /etc/neutron/dhcp_agent.ini`
+- *Cấu hình dhcp-agent* `vi /etc/neutron/dhcp_agent.ini`
 
 ```sh
 [DEFAULT]
@@ -674,7 +768,7 @@ use_namespaces = True
 verbose = True
 ```
 
-Cau hinh metadata agent `vi /etc/neutron/metadata_agent.ini`
+- *Cấu hình metadata agent* `vi /etc/neutron/metadata_agent.ini`
 
 ```sh
 [DEFAULT]
@@ -690,7 +784,7 @@ verbose = True
 neutron
 ```
 
-Tai CONTROLLER `vi /etc/nova/nova.conf`
+- *QUAY LẠI CONTROLLER NODE* `vi /etc/nova/nova.conf`
 
 ```sh
 [neutron]
@@ -700,28 +794,36 @@ metadata_proxy_shared_secret = osjuno123a@
 restart nova
 ```
 
-restart nova
+- *Restart nova trên controller node*
 
-`service nova-api restart`
+`# service nova-api restart`
 
-Cau hinh OVS service
+<a name="2.6"></a>
+####2.6 Cấu hình OVS service
+<ul>
+OVS giúp tạo ra mạng ảo cho các instance. br-int xử lý traffic bên trong, br-ex xử lý các traffic bên ngoài. Vì thế br-ex cần dùng một interface vật lý bên ngoài để cho phép các truy cập mạng bên ngoài. Về bản chất, cổng này kết nối mạng ảo với mạng vật lý bên ngoài
+</ul>
 
-restart OVS
+- *Restart OVS*
 
-`service openvswitch-switch restart`
+`# service openvswitch-switch restart`
 
-Tao external-br
+- *Tạo external-br*
 
 ```sh
 ovs-vsctl add-br br-ex
 ovs-vsctl add-port br-ex eth1
 ```
 
--> mat ket noi
+<ul>
+**Chú ý:** Sau khi thực hiện bước tạo external-br và add port br-ex vào eth1 sẽ bị mất kết nối ssh đến network node, để thực hiện các cấu hình tiếp theo ta có nhiều cách để truy cập vào network node. Có thể cấu hình trực tiếp trên máy ảo VMware, hoặc từ máy controller ta sử dụng câu lệnh `ssh uvdc@10.10.10.201`sau đó nhập password để truy cập vào máy network với username là uvdc theo dải mạng management nối giữa các máy
+</ul>
 
-`ethtool -K eth1 gro off`
+- *Tạm thời vô hiệu hóa GRO trên external interface*
 
-Cau hinh lai file `vi /etc/network/interfaces`
+`# ethtool -K eth1 gro off`
+
+- *Cấu hình lại mạng cho network node* `vi /etc/network/interfaces`
 
 ```sh
 auto eth0
@@ -753,11 +855,11 @@ network 10.10.20.0
 restart mang
 ```
 
-restart network
+- *Restart network*
 
-`ifdown -a && ifup -a`
+`# ifdown -a && ifup -a`
 
-restart neutron
+- *Restart neutron*
 
 ```sh
 service neutron-plugin-openvswitch-agent restart
@@ -765,13 +867,13 @@ service neutron-l3-agent restart
 service neutron-dhcp-agent restart
 service neutron-metadata-agent restart
 ```
+----------------------------------------------------------------------------------------------------------------------------
 
-----------------------------------------------------------------------------------------------------------------------------------------------------------------
-----------------------------------------------------------------------------------------------------------------------------------------------------------------
-----------------------------------------------------------------------------------------------------------------------------------------------------------------
-COMPUTE
+<a name="III"></a>
+##III COMPUTE NODE
 
-add repo
+<a name="3.1"></a>
+####3.1.	Enable OpenStack repository.
 
 ```sh
 # apt-get install ubuntu-cloud-keyring
@@ -779,19 +881,45 @@ add repo
   "trusty-updates/juno main" > /etc/apt/sources.list.d/cloudarchive-juno.list
 ```
 
-update
+<a name="3.2"></a>
+####3.2.	Upgrade các packages hệ thống.
 
 `# apt-get update -y && apt-get dist-upgrade -y`
 
-cai dat python-mysql
+<a name="3.3"></a>
+####3.3.	Cài đặt python-mysql.
 
-`# apt-get install python-mysqldb`
+`# apt-get install python-mysqldb -y`
 
-Cai nova
+<a name="3.4"></a>
+####3.4.	Cài đặt NTP service
 
-`apt-get install nova-compute sysfsutils`
+- *Download và cài đặt NTP*
 
-Edit file `vi /etc/nova/nova.conf`
+`# apt-get install ntp -y`
+
+- *Cấu hình NTP* `vi /etc/ntp.conf`
+<ul>
+comment lại các dòng sau
+</ul>
+```sh
+#server 0.ubuntu.pool.ntp.org
+#server 1.ubuntu.pool.ntp.org
+#server 2.ubuntu.pool.ntp.org
+#server 3.ubuntu.pool.ntp.org
+
+````
+<ul>
+Sửa dòng `server ntp.ubuntu.com` thàhh `server 10.10.10.200 iburst`
+</ul>
+
+<a name="3.5"></a>
+####3.5 Cài đặt Nova
+
+- *Download và cài đặt nova*
+`# apt-get install nova-compute sysfsutils -y`
+
+- *Cấu hình nova* `vi /etc/nova/nova.conf`
 
 ```sh
 [DEFAULT]
@@ -820,13 +948,13 @@ admin_password = osjuno123a@
 host = 10.10.10.200
 ```
 
-Cau hinh qemu
+- *Xác định compute node hỗ trợ tăng tốc phần cứng máy ảo nào*
 
-`egrep -c '(vmx|svm)' /proc/cpuinfo`
+`# egrep -c '(vmx|svm)' /proc/cpuinfo`
 
-Neu tra ve gia tri >1 tuc la ho tro
+Nếu trả về giá trị >=1 thì compute node hỗ trợ tăng tốc phần cứng, không cần cấu hình thêm
 
-Neu tra ve 0 thi cau hinh lai file `vi /etc/nova/nova-compute.conf`
+Nếu trả về giá trị = 0 ta cần cấu hình lại `vi /etc/nova/nova-compute.conf`
 
 ```sh
 [libvirt]
@@ -834,30 +962,33 @@ Neu tra ve 0 thi cau hinh lai file `vi /etc/nova/nova-compute.conf`
 virt_type = qemu
 ```
 
-restart nova
+- *Restart nova*
 
-`service nova-compute restart`
+`# service nova-compute restart`
 
-xoa db mac dinh
+- *Xóa nova database mặc định*
 
-`rm -f /var/lib/nova/nova.sqlite`
+`# rm -f /var/lib/nova/nova.sqlite`
 
+<a name="3.6"></a>
+####3.6 Cài đặt Neutron
 
-Cai dat neutron
-
-them cac dong sau vao file `vi /etc/sysctl.conf`
+*Cấu hình các thông số mạng*  `vi /etc/sysctl.conf` *và thêm nội dung sau*
 
 ```sh
 net.ipv4.conf.all.rp_filter=0
 net.ipv4.conf.default.rp_filter=0
-sysctl -p
 ```
 
-Cai neutron
+- *Thực hiện các thay đổi thông số mạng này ngay lập tức:*
 
-`apt-get install neutron-plugin-ml2 neutron-plugin-openvswitch-agent`
+`# sysctl -p`
 
-Edit file `vi /etc/neutron/neutron.conf`
+- *Download và cài đặt neutron*
+
+`# apt-get install neutron-plugin-ml2 neutron-plugin-openvswitch-agent -y`
+
+- *Cấu hình neutron trên computenode* `vi /etc/neutron/neutron.conf`
 
 ```sh
 [DEFAULT]
@@ -880,7 +1011,7 @@ admin_user = neutron
 admin_password = osjuno123a@
 ```
 
-Cau hinh ml2 `vi /etc/neutron/plugins/ml2/ml2_conf.ini`
+- *Cấu hình ml2-plugin* `vi /etc/neutron/plugins/ml2/ml2_conf.ini`
 
 ```sh
 [ml2]
@@ -909,9 +1040,11 @@ enable_tunneling = True
 tunnel_types = gre
 ```
 
-cau hinh OVS `service openvswitch-switch restart`
+- *Cấu hình OVS* 
 
-Cau hinh compute su dung networking `vi /etc/nova/nova.conf`
+`# service openvswitch-switch restart`
+
+- Cấu hình compute sử dụng networking `vi /etc/nova/nova.conf`
 
 ```sh
 [DEFAULT]
@@ -931,20 +1064,215 @@ admin_username = neutron
 admin_password = osjuno123a@
 ```
 
-restart nova
+- *Restart nova*
 
-`service nova-compute restart`
+`# service nova-compute restart`
 
-restart ovs
+- *Restart OVS*
 
-`service neutron-plugin-openvswitch-agent restart`
+`# service neutron-plugin-openvswitch-agent restart`
 
-Trần Mạnh Huy
-Commit changes
+<a name="IV"></a>
+##IV. Cài đặt Horizon
+<ul>
+Sau khi thực hiện xong các bước cài đặt ở trên, ta quay lại controller node và thực hiện cài đặt horizon-dashboard
+</ul>
+
+- *Cài đặt openstack-dashboard*
+
+`# apt-get install openstack-dashboard apache2 libapache2-mod-wsgi memcached python-memcache -y`
+
+- *Xóa theme mặc định Ubuntu*
+
+`# dpkg --purge openstack-dashboard-ubuntu-theme`
+
+- *Fix bug apache2*
+```sh
+#echo "ServerName localhost" > /etc/apache2/conf-available/servername.conf
+#sudo a2enconf servername
+```
+
+- *Restart webserver*
+```sh
+# service apache2 restart
+# service memcached restart
+```
+
+**REBOOT tất cả các node**
+
+- *Truy cập vào địa chỉ http://172.16.69.200/horizon*
+
+<img src="http://i.imgur.com/3QkgCiU.png">
+
+*Đăng nhập với username/password: admin/osjuno123a@*
+
+<a name="C"></a>
+#C . Kiểm tra lại quá trình cài đặt
+
+<a name="a"></a>
+####a. Kiểm tra hoạt động của các dịch vụ
+<ul>
+Vào controller node kiểm tra các dịch vụ đã hoạt động tốt chưa
+</ul>
+- *Kiểm tra các dịch vụ của nova* `# nova-manage service list`
+<img src="http://i.imgur.com/k1kd1v0.png">
+- *Kiểm tra các dịch vụ của neutron* `#neutron agent-list`
+<img src="http://i.imgur.com/uirqCpY.png">
+
+- *Truy cập vào địa chỉ http://172.16.69.200/horizon*
+
+<img src="http://i.imgur.com/3QkgCiU.png">
+<b name="b"></a>
+####b. Tạo external network
+
+- *Chọn admin -> networks*
+
+<img src="http://i.imgur.com/kAVfLp3.png">
+
+- *Chọn Create network*
+
+<img src="http://i.imgur.com/5X7LGiY.png">
+
+- *Nhập các thông tin -> Create network*
+
+<img src="http://i.imgur.com/kbDtE51.png">
+
+- #####*Tạo subnet cho external network*
+
+- *Chọn external*
+
+<img src="http://i.imgur.com/TRequFv.png">
+
+- *Chọn Create Subnet*
+
+<img src="http://i.imgur.com/66rJFKD.png">
+
+- *Nhập thông tin cần thiết -> Next*
+
+<img src="http://i.imgur.com/HQvNhy4.png">
+
+- *Nhập các địa chỉ được cho phép sử dụng ở dải external ->create*
+
+<img src="http://i.imgur.com/raurBKa.png">
+
+- *Thông báo như sau là thành công*
+
+<img src="http://i.imgur.com/8tZjMwS.png">
+
+<a name="c"></a>
+####c. Tạo internal network
+
+- *Để tạo mới một internal network: Chọn Project -> Networks*
+
+<img src="http://i.imgur.com/RZkuboT.png">
+
+- *Chọn Create Network*
+
+<img src="http://i.imgur.com/gwaGt4q.png">
+
+- *Nhập các thông tin cho internal network -> Next*
+
+<img src="http://i.imgur.com/yRCKhTG.png">
+
+- *Tạo subnet cho internal network*
+
+<img src="http://i.imgur.com/K3QJNA8.png">
+
+- *Add các địa chỉ được sử dụng trong dải internal -> create*
+
+<img src="http://i.imgur.com/Zxe8xH3.png">
+
+<a name="d"></a>
+####d. Tạo router
+- *Để tạo router chọn Project -> Network -> Router* 
+
+<img src="http://i.imgur.com/qjBonTJ.png">
+- *Chọn create router*
+
+<img src="http://i.imgur.com/AjATj3F.png">
+
+- *Đặt tên cho router -> chọn Next*
+
+<img src="http://i.imgur.com/OU8HvR4.png">
+
+- *Đặt gateway cho router cho phép ra mạng bên ngoài*
+
+<img src="http://i.imgur.com/fkNBtu2.png">
+
+- *Chọn external -> Set Gateway*
+
+<img src="http://i.imgur.com/flaSQzz.png">
+
+<ul>
+**Thêm 1 interface mới cho mạng bên trong đi qa router**
+</ul>
+
+- *Click chọn Router*
+
+<img src="http://i.imgur.com/XmbJ8UT.png">
+
+- *Chọn Internal network -> Add interface*
+
+<img src="http://i.imgur.com/koBDnAl.png">
 
 
-  Commit directly to the master branch
-  Create a new branch for this commit and start a pull request. Learn more about pull requests.
-Commit changes  Cancel
-Status API Training Shop Blog About
-© 2015 GitHub, Inc. Terms Privacy Security Contact
+<a name="e"></a>
+####e. Kiểm tra lại mô hình mạng
+
+- *Để kiểm tra mô hình mạng ta chọn Project -> Network -> Network Topology*
+
+<img src="http://i.imgur.com/hsgIU4q.png">
+
+- *Chọn Normal*
+
+<img src="http://i.imgur.com/JiWtkP8.png">
+
+<a name="f"></a>
+####f. Khởi tạo 1 instances
+
+- *Để khởi tạo 1 instace ta chọn Project -> Compute -> Instances*
+
+<img src="http://i.imgur.com/MoSNybV.png">
+
+-  *Chọn Launch instance*
+
+<img src="http://i.imgur.com/uLZxEBQ.png">
+
+- *Chọn các cấu hình như sau -> Launch*
+
+<img src="http://i.imgur.com/EVZFa53.png">
+
+- *Tại phần Network chọn Internal (click vào dấu +) -> Launch*
+
+<img src="http://i.imgur.com/e7sFKkT.png">
+
+- *Clik chọn vào instance vừa khởi tạo* 
+
+<img src="http://i.imgur.com/2tEUhwk.png">
+
+- *Chọn console*
+
+<img src="http://i.imgur.com/IYpGRk9.png">
+
+- *Đăng nhập với username/password hiển thị trên màn hình*
+
+<img src="http://i.imgur.com/n7kUSt3.png">
+
+- *Kiểm tra kết nối của instace*
+
+<img src="http://i.imgur.com/3rULjOD.png">
+
+**Cài đặt openstack thành công**
+
+
+<a name="D"></a>
+#D. Tài liệu tham khảo
+
+http://docs.openstack.org/juno/install-guide/install/apt/content/
+
+https://github.com/vietstacker/openstack-juno-multinode-U14.04-v1
+
+Video hướng dẫn sử dụng dashboard https://www.youtube.com/watch?v=O119UIscdvg
+
+Video hướng dẫn cài đặt Openstack Juno bằng shell script https://www.youtube.com/watch?v=IaZtWQmDjks
+
