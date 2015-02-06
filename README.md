@@ -4,6 +4,7 @@ Bài viết này tham khảo tại địa chỉ http://docs.openstack.org/juno/i
 
 *Các mật khẩu trong quá trình cài đặt đều là :* **osjuno123a@** 
 ----------------------------------------------------------------------------------------------------------------------------
+
 [A. Mô hình cài đặt](#A)
 
 [B. Các bước cài đặt chính](#B)
@@ -42,14 +43,14 @@ Bài viết này tham khảo tại địa chỉ http://docs.openstack.org/juno/i
 - [IV. Cài đặt Horizon](#IV)
 
 [C. Kiểm tra lại quá trình cài đặt](#C)
-<ul>
-<li>		 [a. Kiểm tra hoạt động của các dịch vụ.]</li>(#a)
-<li>		 [b. Tạo external network.]</li>(#b)
-<li>	 	 [c. Tạo internal network.]</li>(#c) 
-<li>		 [d. Tạo router.]</li>(#d)
-<li>		 [e. Kiểm tra lại mô hình mạng.]</li>(#e)
-<li>		 [f. Khởi tạo 1 instances.]</li>(#f)
-</ul>
+
+<li>		 [a. Kiểm tra hoạt động của các dịch vụ.](#a)</li>
+<li>		 [b. Tạo external network.](#b)</li>
+<li>	 	 [c. Tạo internal network.]</li>(#c)</li>
+<li>		 [d. Tạo router.]</li>(#d)</li>
+<li>		 [e. Kiểm tra lại mô hình mạng.]</li>(#e)</li>
+<li>		 [f. Khởi tạo 1 instances.]</li>(#f)</li>
+
 [D. Tài liệu tham khảo](#D)
 
 ----------------------------------------------------------------------------------------------------------------------------
