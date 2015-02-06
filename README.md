@@ -43,14 +43,14 @@ Bài viết này tham khảo tại địa chỉ http://docs.openstack.org/juno/i
 - [IV. Cài đặt Horizon](#IV)
 
 [C. Kiểm tra lại quá trình cài đặt](#C)
-
-<li>		 [a. Kiểm tra hoạt động của các dịch vụ.](#a)</li>
-<li>		 [b. Tạo external network.](#b)</li>
-<li>	 	 [c. Tạo internal network.]</li>(#c)</li>
-<li>		 [d. Tạo router.]</li>(#d)</li>
-<li>		 [e. Kiểm tra lại mô hình mạng.]</li>(#e)</li>
-<li>		 [f. Khởi tạo 1 instances.]</li>(#f)</li>
-
+<ul>
+[a. Kiểm tra hoạt động của các dịch vụ.](#a)
+[b. Tạo external network.](#b)
+[c. Tạo internal network.](#c)
+[d. Tạo router.](#d)
+[e. Kiểm tra lại mô hình mạng.](#e)
+[f. Khởi tạo 1 instances.](#f)
+</ul>
 [D. Tài liệu tham khảo](#D)
 
 ----------------------------------------------------------------------------------------------------------------------------
