@@ -22,6 +22,7 @@ Bài viết này tham khảo tại địa chỉ http://docs.openstack.org/juno/i
 <li>		[1.9. Cài đặt Glance.](#1.9)</li>
 <li>		[1.10 Cài đặt Nova.](#1.10)</li>
 <li>		[1.11 Cài đặt Neutron.](#1.11)</li>
+<li>    [1.12 Cài đặt Cinder.](#1.12)</li>
 </ul>
 - [II. NETWORK NODE](#II)
 <ul>
@@ -192,7 +193,7 @@ Reload privilege tables now? [Y/n]: y
 
 - *Tạo các database cho từng service chính của Openstack**
 <ul>
-Các project chính của Openstack gồm có **Keystone**, **Glance**, **Nova**, **Neutron**. Mỗi một service này cần một database riêng để lưu trữ cơ sở dữ liệu của mình.
+Các project chính của Openstack gồm có **Keystone**, **Glance**, **Nova**, **Neutron**, **Cinder** Mỗi một service này cần một database riêng để lưu trữ cơ sở dữ liệu của mình.
 </ul>
 <ul>
 Để tạo các database này ta thực hiện theo bước sau:
@@ -226,6 +227,13 @@ CREATE DATABASE neutron;
 GRANT ALL PRIVILEGES ON neutron.* TO 'neutron'@'%' IDENTIFIED BY 'osjuno123a@';
 GRANT ALL PRIVILEGES ON neutron.* TO 'neutron'@'localhost' IDENTIFIED BY 'osjuno123a@';
 GRANT ALL PRIVILEGES ON neutron.* TO 'neutron'@'10.10.10.200' IDENTIFIED BY 'osjuno123a@';
+```
+*Tạo database cho Cinder*
+```sh
+CREATE DATABASE cinder;
+GRANT ALL PRIVILEGES ON cinder.* TO 'cinder'@'%' IDENTIFIED BY 'osjuno123a@';
+GRANT ALL PRIVILEGES ON cinder.* TO 'cinder'@'localhost' IDENTIFIED BY 'osjuno123a@';
+GRANT ALL PRIVILEGES ON cinder.* TO 'cinder'@'10.10.10.200' IDENTIFIED BY 'osjuno123a@';
 ```
 
 <a name="1.6"></a>
@@ -310,6 +318,8 @@ Dịch vụ xác thực (Identity service) trong Open stack ngoài nhiệm vụ 
 # keystone user-create --name nova --pass osjuno123a@
 
 # keystone user-create --name neutron --pass osjuno123a@
+
+# keystone user-create --name cinder --pass osjuno123a@
 ```
 
 - *Add role cho các user*
@@ -320,6 +330,8 @@ Dịch vụ xác thực (Identity service) trong Open stack ngoài nhiệm vụ 
 # keystone user-role-add --user nova --tenant service --role admin
 
 # keystone user-role-add --user neutron --tenant service --role admin
+
+# keystone user-role-add --user cinder --tenant service --role admin
 ```
 
 - *Tạo các service entity cho từng dịch vụ*
@@ -336,6 +348,9 @@ Dịch vụ xác thực (Identity service) trong Open stack ngoài nhiệm vụ 
 
 # keystone service-create --name neutron --type network \
   --description "OpenStack Networking"
+
+# keystone service-create --name cinder --type volume \
+  --description "OpenStack Block Storage"
 ```
 
 - *Tạo các endpoint tương ứng cho từng dịch vụ*
@@ -379,6 +394,17 @@ Dịch vụ xác thực (Identity service) trong Open stack ngoài nhiệm vụ 
   --internalurl http://10.10.10.200:9696 \
   --region regionOne
 ```
+
+*cinder*
+```sh
+# keystone endpoint-create \
+  --service-id $(keystone service-list | awk '/ volume / {print $2}') \
+  --publicurl http://10.10.10.200:8776/v1/%\(tenant_id\)s \
+  --internalurl http://10.10.10.200:8776/v1/%\(tenant_id\)s \
+  --adminurl http://10.10.10.200:8776/v1/%\(tenant_id\)s \
+  --region regionOne
+```
+
 
 <a name="1.8"></a>
 ####1.8 Tạo Script biến môi trường
@@ -634,6 +660,76 @@ service nova-conductor restart
 
 `# service neutron-server restart``
 
+<a name="1.12"></a>
+####1.12 Cài đặt Cinder
+
+- *Tạo Physical Volume và Volume Group*
+```sh
+fdisk -l
+pvcreate /dev/vdb
+vgcreate cinder-volumes /dev/vdb
+```
+
+**Chú ý** thay thế **vdb** với ổ đĩa tương ứng. Để thực hiện việc này ta sử dụng lệnh `lsblk` như sau:
+
+<img src="http://i.imgur.com/fGomMdp.png">
+
+
+- *Cài đặt Cinder*
+
+`apt-get install -y cinder-api cinder-scheduler cinder-volume iscsitarget open-iscsi iscsitarget-dkms python-cinderclient lvm2`
+
+- Cấu hình cinder bằng cách edit file cinder.con  `vi /etc/cinder/cinder.conf`
+
+**Với nội dung như sau**
+
+```sh
+[DEFAULT]
+verbose = True
+
+rootwrap_config = /etc/cinder/rootwrap.conf
+api_paste_confg = /etc/cinder/api-paste.ini
+iscsi_helper = tgtadm
+volume_name_template = volume-%s
+volume_group = cinder-volumes
+verbose = True
+auth_strategy = keystone
+state_path = /var/lib/cinder
+lock_path = /var/lock/cinder
+volumes_dir = /var/lib/cinder/volumes
+
+auth_strategy = keystone
+
+rpc_backend = rabbit
+rabbit_host = 10.10.10.200
+rabbit_password = osjuno123a@
+
+my_ip = 10.10.10.200
+
+[keystone_authtoken]
+auth_uri = http://10.10.10.200:5000/v2.0
+identity_uri = http://10.10.10.200:35357
+admin_tenant_name = service
+admin_user = cinder
+admin_password = osjuno123a@
+
+[database]
+connection = mysql://cinder:osjuno123a@@10.10.10.200/cinder
+```
+
+- *Đồng bộ cinder database với server*
+
+`su -s /bin/sh -c "cinder-manage db sync" cinder`
+
+- *Restart cinder*
+
+```sh
+service cinder-api restart
+service cinder-scheduler restart
+service cinder-volume restart
+```
+
+----------------------------------------------------------------------------------------------------------------------------
 ----------------------------------------------------------------------------------------------------------------------------
 
 <a name="II"></a>
@@ -872,6 +968,8 @@ service neutron-l3-agent restart
 service neutron-dhcp-agent restart
 service neutron-metadata-agent restart
 ```
+
+----------------------------------------------------------------------------------------------------------------------------
 ----------------------------------------------------------------------------------------------------------------------------
 
 <a name="III"></a>
