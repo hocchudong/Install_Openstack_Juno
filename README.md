@@ -94,9 +94,9 @@ NTP (Network Time protocol) sử dụng để đồng bộ hóa về thời gian
 - *Cấu hình NTP service tại file `vi /etc/ntp.conf`*
 
 - *Sửa dòng* `server ntp.ubuntu.com`
-<ul>
+
 *thành*
-</ul>
+
 ```sh
 server 0.vn.pool.ntp.org iburst 
 server 1.asia.pool.ntp.org iburst 
@@ -112,9 +112,7 @@ restrict -4 default kod notrap nomodify nopeer noquery
 ```
 </ul>
 
-<ul>
 *thành*
-</ul>
 ```sh
 restrict -4 default kod notrap nomodify
 restrict -6 default kod notrap nomodify
@@ -292,7 +290,7 @@ Dịch vụ xác thực (Identity service) trong Open stack ngoài nhiệm vụ 
 
 `# keystone user-create --name admin --pass osjuno123a@ --email admin_osjuno@gmail.com`
 
-- *Tao role admin*
+- *Tạo role admin*
 
 `# keystone role-create --name admin`
 
@@ -300,11 +298,11 @@ Dịch vụ xác thực (Identity service) trong Open stack ngoài nhiệm vụ 
 
 `# keystone user-role-add --user admin --tenant admin --role admin`
 
-- *Tao tenant service cho các dịch vụ*
+- *Tạo tenant service cho các dịch vụ*
 
 `# keystone tenant-create --name service --description "Service Tenant"`
 
-- *Tao cho các service user*
+- *Tạo cho các service user*
 
 ```sh
 # keystone user-create --name glance --pass osjuno123a@
@@ -407,6 +405,7 @@ export OS_AUTH_URL=http://10.10.10.200:35357/v2.0
 `# apt-get install glance python-glanceclient -y`
 
 - *Cấu hình chính Glance* `# vi /etc/glance/glance-api.conf`
+
 ```sh
 [database]
 ...
@@ -436,6 +435,7 @@ verbose = True
 ```
 
 - *Edit file* `vi /etc/glance/glance-registry.conf`
+
 ```sh
 [database]
 ...
@@ -572,7 +572,8 @@ admin_user = neutron
 admin_password = osjuno123a@
 ```
 
-**Chú ý**  nova_admin_tenant_id = , Ta dùng lệnh `keystone tenant-get service` để lấy id
+**Chú ý**  `nova_admin_tenant_id =` , Ta dùng lệnh `keystone tenant-get service` để lấy id tương ứng
+
 
 - *Cấu hình ML2 plug-in* `vi /etc/neutron/plugins/ml2/ml2_conf.ini`
 
@@ -594,7 +595,7 @@ enable_ipset = True
 firewall_driver = neutron.agent.linux.iptables_firewall.OVSHybridIptablesFirewallDriver
 ```
 
-- *Cau hinh compute su dung network* vi /etc/nova/nova.conf
+- *Cau hinh nova su dung network* vi /etc/nova/nova.conf
 ```sh
 [DEFAULT]
 ...
@@ -612,6 +613,7 @@ admin_tenant_name = service
 admin_username = neutron
 admin_password = osjuno123a@
 ```
+
 
 - *Đồng bộ neutron database*
 
@@ -674,9 +676,9 @@ comment lại các dòng sau
 #server 3.ubuntu.pool.ntp.org
 
 ````
-<ul>
-Sửa dòng `server ntp.ubuntu.com` thàhh `server 10.10.10.200 iburst`
-</ul>
+
+Sửa dòng `server ntp.ubuntu.com` thành `server 10.10.10.200 iburst`
+
 
 <a name="2.5"></a>
 ####2.5 Cài đặt Neutron
@@ -719,8 +721,11 @@ identity_uri = http://10.10.10.200:35357
 admin_tenant_name = service
 admin_user = neutron
 admin_password = osjuno123a@
-Cau hinh ml2 vi /etc/neutron/plugins/ml2/ml2_conf.ini
+```
 
+- *Cấu hình ml2-plugin* `vi /etc/neutron/plugins/ml2/ml2_conf.ini`
+
+```sh
 [ml2]
 ...
 type_drivers = flat,gre
@@ -783,7 +788,6 @@ admin_password = osjuno123a@
 nova_metadata_ip = 10.10.10.200
 metadata_proxy_shared_secret = osjuno123a@
 verbose = True
-neutron
 ```
 
 - *QUAY LẠI CONTROLLER NODE* `vi /etc/nova/nova.conf`
@@ -793,7 +797,6 @@ neutron
 ...
 service_metadata_proxy = True
 metadata_proxy_shared_secret = osjuno123a@
-restart nova
 ```
 
 - *Restart nova trên controller node*
@@ -911,9 +914,9 @@ comment lại các dòng sau
 #server 3.ubuntu.pool.ntp.org
 
 ````
-<ul>
-Sửa dòng `server ntp.ubuntu.com` thàhh `server 10.10.10.200 iburst`
-</ul>
+
+Sửa dòng `server ntp.ubuntu.com` thành `server 10.10.10.200 iburst`
+
 
 <a name="3.5"></a>
 ####3.5 Cài đặt Nova
