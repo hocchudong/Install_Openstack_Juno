@@ -160,8 +160,9 @@ Cấu hình để cho phép các node khác trong mạng có thể truy cập đ
 
 `vi /etc/mysql/my.cnf`
 
+Tại section `[mysqld]` Sửa dòng `bind-address = 127.0.0.1` thành đoạn dưới:
+
 ```sh
-[mysqld]
 bind-address = 0.0.0.0
 default-storage-engine = innodb
 innodb_file_per_table
